@@ -11,7 +11,7 @@ module.exports = {
     entry: [
         // Polyfills go here too, like babel-polyfill or whatwg-fetch
         'babel-polyfill',
-        path.join(__dirname, 'app/index.js')
+        path.join(__dirname, '/app/index.js'),
     ],
     // Where you want the output to go
     output: {
@@ -19,6 +19,7 @@ module.exports = {
         filename: '[name]-[hash].min.js',
         publicPath: '/'
     },
+
     plugins: [
         // webpack gives your modules and chunks ids to identify them. Webpack can vary the
         // distribution of the ids to get the smallest id length for often used ids with
