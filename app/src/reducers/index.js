@@ -2,6 +2,7 @@ import { routerReducer as routing } from 'react-router-redux';
 import { combineReducers } from 'redux';
 import * as types from '../actions/types';
 import {employeeReducers} from '../../employee/reducers';
+import {authenticationReducers} from '../../authentication/reducers';
 
 const filter = (state = '', action) => {
     switch (action.type) {
@@ -17,6 +18,9 @@ const rootReducer = combineReducers({
     filter,
     employee: combineReducers({
         ...employeeReducers
+    }),
+    authentication: combineReducers({
+        ...authenticationReducers
     }),
     routing
 });
