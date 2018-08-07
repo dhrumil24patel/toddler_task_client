@@ -44,6 +44,62 @@ module.exports = {
                 loader: 'eslint'
             }
         ],
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: path.resolve(__dirname, 'src'),
+                enforce: 'pre',
+                use: 'source-map-loader'
+            },
+            {
+                test: /\.js$/,
+                exclude: /(node_modules)/,
+                use:{
+                    loader: "babel-loader",
+                    query: {
+                        plugins: ['syntax-dynamic-import']
+                    }
+                }
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    {loader: "style-loader"},
+                    {loader: "css-loader"},
+                ]
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    {loader: "style-loader"},
+                    {loader: "css-loader"},
+                    {loader: "sass-loader"}
+                ]
+            },
+            {
+                test: /\.inCSS.svg$/,
+                use: [
+                    {loader: "svg-url-loader"}
+                ]
+            },
+            {
+                test: /\.inline.svg$/,
+                use: [
+                    {loader: "svg-inline-loader"}
+                ]
+            },
+            {
+                test: /\.js$/,
+                exclude: /(node_modules)/,
+                use:{
+                    loader: "babel-loader",
+                    options: {
+                        presets: ["es2015", "stage-0","env"],
+                        plugins: ['syntax-dynamic-import','transform-dynamic-import-to-static']
+                    }
+                }
+            }
+        ],
         loaders: [
             {
                 test: /\.js?$/,
@@ -56,7 +112,7 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loader: 'style!css?modules&localIdentName=[name]---[local]---[hash:base64:5]!sass'
+                loader: 'style!css?modules&localIdentName=[local]!sass'
             },
             { test: /\.woff(2)?(\?[a-z0-9#=&.]+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff' },
             { test: /\.(ttf|eot|svg)(\?[a-z0-9#=&.]+)?$/, loader: 'file' }

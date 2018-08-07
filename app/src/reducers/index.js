@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import * as types from '../actions/types';
 import {employeeReducers} from '../../employee/reducers';
 import {authenticationReducers} from '../../authentication/reducers';
+import {dashboardReducers} from '../../dashboard/reducers';
 import {getApolloClient} from '../../graphql/helpers/apolloClientHelper';
 
 const client = getApolloClient();
@@ -24,6 +25,9 @@ const rootReducer = combineReducers({
     }),
     authentication: combineReducers({
         ...authenticationReducers
+    }),
+    dashboard: combineReducers({
+        ...dashboardReducers
     }),
     routing
 });
