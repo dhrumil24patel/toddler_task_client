@@ -27,3 +27,10 @@ export function reportAuthenticationProcessing(payload) {
         payload: payload
     };
 }
+
+export function reportUserData(payload) {
+    return {
+        type: types.USER_DATA,
+        payload: payload
+    };
+}

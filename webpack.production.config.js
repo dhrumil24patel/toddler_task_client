@@ -17,7 +17,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, '/dist/'),
         filename: '[name]-[hash].min.js',
-        publicPath: '/'
+        publicPath: './'
     },
 
     plugins: [

@@ -1,5 +1,14 @@
-import{loginUser, logoutUser, registerUser, authenticationProcessing} from './reducers';
+import{loginUser,
+    logoutUser,
+    registerUser,
+    authenticationProcessing,
+    userData}
+    from './reducers';
 
 export const authenticationReducers = {
-    logoutUser, loginUser, registerUser, authenticationProcessing
+    logoutUser,
+    loginUser,
+    registerUser,
+    authenticationProcessing,
+    userData
 };

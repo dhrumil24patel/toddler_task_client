@@ -1,28 +1,32 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import { Route } from 'react-router-dom';
+import {Router, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
 import App from '../components/App';
-import {PrivateRoute} from '../components/PrivateRoute';
+import PrivateRoute from '../components/PrivateRoute';
 import {LoginPage} from '../../authentication/containers/LoginPage';
 import {RegisterPage} from '../../authentication/containers/RegisterPage';
+import {reportUserData} from '../../authentication/actions/index';
 
 class Root extends  React.Component {
 
     constructor(props) {
         super(props);
-        const prop = this.props;
-        this.store = prop.store;
-        this.history = prop.history;
+        this.store = this.props.store;
+        this.history = this.props.history;
+
+        if(localStorage.getItem('user')) {
+            props.reportUserData(JSON.parse(localStorage.getItem('user')));
+        }
     }
 
     render() {
         return (
             <Provider store={this.store}>
                 <div>
-                    <ConnectedRouter history={this.history}>
+                    <ConnectedRouter store={this.store} history={this.history}>
                         <div>
                             <PrivateRoute exact path="/" component={App} />
                             <Route path="/login" component={LoginPage} />
@@ -42,6 +46,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
+        reportUserData
     }, dispatch);
 }
 

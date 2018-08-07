@@ -1,15 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { graphql, compose, withApollo } from 'react-apollo';
+import GetAllUsers from '../../graphql/queries/getAllUsers';
+import LoginUser from '../../graphql/mutations/login';
 
-import { performLogout, performLogin } from '../actions/index';
+import { reportAuthenticationProcessing, performLogin, reportUserData } from '../actions/index';
 
 class LoginPage extends React.Component {
     constructor(props) {
         super(props);
 
         // reset login status
-        this.props.dispatch(performLogout(true));
+        // this.props.dispatch(performLogout(true));
 
         this.state = {
             username: '',
@@ -19,6 +23,10 @@ class LoginPage extends React.Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        if(localStorage.getItem('user')) {
+            props.history.push('/');
+        }
     }
 
     handleChange(e) {
@@ -31,13 +39,31 @@ class LoginPage extends React.Component {
 
         this.setState({ submitted: true });
         const { username, password } = this.state;
-        const { dispatch } = this.props;
+        const {login} = this.props;
         if (username && password) {
-            dispatch(performLogin(username, password));
+            this.props.performLogin(username, password);
+            this.props.reportAuthenticationProcessing(true);
+            login({username, password})
+                .then(res => {
+                    this.props.reportAuthenticationProcessing(false);
+                    console.log('added user ', res);
+                    if(!res.data.login.user || !res.data.login.token) {
+                        alert('Username Password pair mismatch');
+                    } else {
+                        localStorage.setItem('user', JSON.stringify(res.data.login));
+                        this.props.reportUserData(res.data.login);
+                        this.props.history.push('/');
+                    }
+                })
+                .catch(err=>{
+                    this.props.reportAuthenticationProcessing(false);
+                    console.log(err);
+                });
         }
     }
 
     render() {
+        console.log(this.props);
         const { loggingIn } = this.props;
         const { username, password, submitted } = this.state;
         return (
@@ -72,11 +98,68 @@ class LoginPage extends React.Component {
 }
 
 function mapStateToProps(state) {
+    console.log('LoginPage');
     const { authenticationProcessing } = state.authentication;
     return {
         loggingIn: authenticationProcessing
     };
 }
 
-const connectedLoginPage = connect(mapStateToProps)(LoginPage);
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({
+        performLogin,
+        reportAuthenticationProcessing,
+        reportUserData
+    }, dispatch);
+}
+
+const connectedLoginPage = withApollo(compose(graphql(
+    GetAllUsers,
+    {
+        options: {
+            fetchPolicy: 'cache-first'
+        },
+        props: ({ data: { users =  [], loading } }) => ({
+            users: users,
+            loading
+        })
+    }
+), graphql(
+    LoginUser,
+    {
+        options: {
+            update: (proxy, {data: {addUser}}) => {
+                // const query = GetAllUsers;
+                // const data = proxy.readQuery({query});
+                //
+                // data.users = [...data.users.filter(user => user._id !== addUser._id), addUser];
+                //
+                // proxy.writeQuery({query, data});
+                //
+                // // Create cache entry for QueryGetEvent
+                // const query2 = GetAllUsers;
+                // const variables = { username: addUser.username, password: addUser.password };
+                // const data2 = { getEvent: { ...addUser } };
+                //
+                // proxy.writeQuery({ query: query2, variables, data: data2 });
+                // console.log(addUser, data);
+            }
+        },
+        props: (props) => ({
+            login: (event) => {
+                return props.mutate({
+                    variables: { username: event.username, password: event.password },
+                    optimisticResponse: () => ({
+                        // login: {
+                        //     name: event.username, password: event.password, __typename: 'User', users: { __typename: 'User' }
+                        // }
+                        login: {
+                            user: {}, token: '', username: event.username, _id: '', password: event.password, __typename: 'User'
+                        }
+                    }),
+                });
+            }
+        })
+    }
+))(connect(mapStateToProps, mapDispatchToProps)(LoginPage)));
 export { connectedLoginPage as LoginPage };

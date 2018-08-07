@@ -1,4 +1,10 @@
-import {USER_ACTION_REGISTER, USER_ACTION_LOGIN, USER_ACTION_LOGOUT, AUTHENTICATION_PROCESSING} from '../actions/type';
+import {
+    USER_ACTION_REGISTER,
+    USER_ACTION_LOGIN,
+    USER_ACTION_LOGOUT,
+    AUTHENTICATION_PROCESSING,
+    USER_DATA
+} from '../actions/type';
 
 
 export const loginUser = (state = null, action) => {
@@ -24,6 +30,13 @@ export const registerUser = (state = null, action) => {
 
 export const authenticationProcessing = (state = false, action) => {
     if(action.type === AUTHENTICATION_PROCESSING) {
+        return action.payload;
+    }
+    return state;
+};
+
+export const userData = (state = false, action) => {
+    if(action.type === USER_DATA) {
         return action.payload;
     }
     return state;

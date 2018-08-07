@@ -4,14 +4,19 @@ import { render } from 'react-dom';
 import {Provider} from 'react-redux';
 import { configureStore, history } from './src/store/configureStore';
 import Root from './src/containers/Root';
+import { ApolloProvider } from 'react-apollo';
+
+import {getApolloClient} from './graphql/helpers/apolloClientHelper';
 
 const store = configureStore();
 window.store = store;
 
+const client = getApolloClient();
+
 render(
-    <Provider store={store}>
+    <ApolloProvider store={store} client={client}>
         <Root store={store} history={history} />
-    </Provider>,
+    </ApolloProvider>,
     document.getElementById('root')
 );
 
@@ -22,9 +27,9 @@ if (module.hot) {
         const newHistory = newConfigureStore.history;
         const NewRoot = require('./src/containers/Root').default;
         render(
-            <Provider store={newStore}>
+            <ApolloProvider store={newStore}>
                 <NewRoot store={newStore} history={newHistory} />
-            </Provider>,
+            </ApolloProvider>,
             document.getElementById('root')
         );
     });

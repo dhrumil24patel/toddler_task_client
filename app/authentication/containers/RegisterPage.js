@@ -2,7 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
+import { graphql, compose, withApollo } from 'react-apollo';
+import GetAllOrganization from '../../graphql/queries/getAllOrganizations';
+import RegisterUser from '../../graphql/mutations/register';
+
+import DepartmentsListComponent from '../components/departmentsListComponent';
+
 import {performRegister} from '../actions/index';
+import {reportAuthenticationProcessing} from '../actions';
+import {bindActionCreators} from 'redux';
 
 class RegisterPage extends React.Component {
     constructor(props) {
@@ -13,7 +21,10 @@ class RegisterPage extends React.Component {
                 firstName: '',
                 lastName: '',
                 username: '',
-                password: ''
+                password: '',
+                organization: '',
+                department: '',
+                admin: false
             },
             submitted: false
         };
@@ -38,10 +49,37 @@ class RegisterPage extends React.Component {
 
         this.setState({ submitted: true });
         const { user } = this.state;
-        const { dispatch } = this.props;
-        if (user.firstName && user.lastName && user.username && user.password) {
-            dispatch(performRegister(user));
+        if (user.firstName && user.lastName && user.username && user.password && user.organization && user.department) {
+            this.props.performRegister(user);
+            this.props.reportAuthenticationProcessing(true);
+            this.props.register(user)
+                .then(res=>{
+                    localStorage.setItem('user', JSON.stringify(res.data.register));
+                    this.props.reportUserData(res.data.register);
+                    console.log('done registration');
+                    this.props.history.push('/');
+                })
+                .catch(err=>{
+                    console.log('err registration ', JSON.stringify(err));
+                    alert('problem with username');
+                });
         }
+    }
+
+    renderOrganizations() {
+        console.log('register ', this.props, this.state);
+        const {organizations} = this.props;
+        const user = this.state.user;
+        if(organizations.length === 1 || user.organization === '') {
+            // user.organization = organizations[0].name;
+            // this.setState({user: user});
+        }
+        return [{_id: 'default', name: 'pick an organization'}, ...organizations].map(item=>{
+            if(item._id === 'default') {
+                return (<option selected={'selected'} disabled={'disabled'} value={item.name} key={item._id}>{item.name}</option>);
+            }
+            return (<option value={item.name} key={item._id}>{item.name}</option>);
+        });
     }
 
     render() {
@@ -79,6 +117,20 @@ class RegisterPage extends React.Component {
                         <div className="help-block">Password is required</div>
                         }
                     </div>
+                    <div className={'form-group' + (submitted && !user.password ? ' has-error' : '')}>
+                        <label htmlFor="organization">Organization</label>
+                        <select name="organization" className="form-control" value={user.organization} onChange={this.handleChange} onSelect={this.handleChange}>
+                            {this.renderOrganizations()}
+                        </select>
+                        {submitted && !user.organization &&
+                        <div className="help-block">Organization is required</div>
+                        }
+                    </div>
+                    {(user.organization !== '' ? <DepartmentsListComponent organization={user.organization} submitted={submitted} user={user} handleChange={this.handleChange}/> : '')}
+                    <div className={'form-group'}>
+                        <label htmlFor="admin">Admin</label>
+                        <input type="checkbox"  name="admin" value={user.admin} onChange={this.handleChange} />
+                    </div>
                     <div className="form-group">
                         <button className="btn btn-primary">Register</button>
                         {registering &&
@@ -99,5 +151,62 @@ function mapStateToProps(state) {
     };
 }
 
-const connectedRegisterPage = connect(mapStateToProps)(RegisterPage);
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({
+        performRegister,
+        reportAuthenticationProcessing
+    }, dispatch);
+}
+
+const connectedRegisterPage = withApollo(compose(
+    graphql(
+        GetAllOrganization,
+        {
+            options: {
+                fetchPolicy: 'cache-first'
+            },
+            props: ({ data: { organizations =  [], loading } }) => ({
+                organizations: organizations,
+                loading
+            })
+        }
+), graphql(
+    RegisterUser,
+    {
+        options: {
+            update: (proxy, {data: {addUser}}) => {
+                const query = GetAllOrganization;
+                const data = proxy.readQuery({query});
+
+                data.users = [...data.users.filter(user => user._id !== addUser._id), addUser];
+
+                proxy.writeQuery({query, data});
+
+                // Create cache entry for QueryGetEvent
+                const query2 = GetAllOrganization;
+                const variables = { name: addUser.name, password: addUser.password };
+                const data2 = { getEvent: { ...addUser } };
+
+                proxy.writeQuery({ query: query2, variables, data: data2 });
+                console.log(addUser, data);
+            }
+        },
+        props: (props) => ({
+            register: (event) => {
+                return props.mutate({
+                    variables: event,
+                    optimisticResponse: () => ({
+                        // addUser: {
+                        //     name: event.username, password: event.password, __typename: 'User', users: { __typename: 'User' }
+                        // }
+                        register: {
+                            firstName: event.firstName, lastName: event.lastName, username: event.username, _id: '', password: event.password, __typename: 'User'
+                        }
+                    }),
+                });
+            }
+        })
+    }
+))(connect(mapStateToProps, mapDispatchToProps)(RegisterPage)));
+
 export { connectedRegisterPage as RegisterPage };
