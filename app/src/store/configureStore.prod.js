@@ -12,6 +12,6 @@ export function configureStore(initialState) {
     return createStore(
         rootReducer,
         initialState,
-        applyMiddleware(middleware, client.middleware()),
+        applyMiddleware(middleware),
     );
 }

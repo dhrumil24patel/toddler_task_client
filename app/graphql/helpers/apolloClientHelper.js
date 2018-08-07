@@ -47,7 +47,7 @@ export const getApolloClient = () => {
         //     uri: 'http://localhost:3000/graphql'
         // });
     }
-    console.log(apolloClient);
+    // console.log(apolloClient);
 
     // apolloClient
     //     .query({
