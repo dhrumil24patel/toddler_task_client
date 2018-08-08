@@ -83,7 +83,9 @@ export default withApollo(compose(
     graphql(
         GetAllDepartments,
         {
-            options: (props) => ({ variables: { organization: props.organization } }),
+            options: (props) => ({
+                variables: { organization: props.organization }
+            }),
             props: ({ data: { departments =  [], loading } }) => ({
                 departments: departments,
                 loading

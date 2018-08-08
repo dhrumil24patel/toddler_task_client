@@ -5,7 +5,7 @@ import {Router, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
 import App from '../components/App';
-import AdminDashboard from '../../dashboard/containers/adminDashboard';
+import ManagerDashboardContainer from '../../dashboard/containers/manager/managerDashboardContainer';
 import PrivateRoute from '../components/PrivateRoute';
 import {LoginPage} from '../../authentication/containers/LoginPage';
 import {RegisterPage} from '../../authentication/containers/RegisterPage';
@@ -29,7 +29,7 @@ class Root extends  React.Component {
                 <div>
                     <ConnectedRouter store={this.store} history={this.history}>
                         <div>
-                            <PrivateRoute exact path="/" component={AdminDashboard} />
+                            <PrivateRoute exact path="/" component={ManagerDashboardContainer} />
                             <Route path="/login" component={LoginPage} />
                             <Route path="/register" component={RegisterPage} />
                         </div>

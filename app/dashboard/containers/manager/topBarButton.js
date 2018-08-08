@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {dropdownmenu, dropdownmessages, navbartoplinks} from '../../src/styles/filterableTable.scss';
+import {dropdownmenu, dropdownmessages, navbartoplinks} from '../../../src/styles/filterableTable.scss';
 
-import {reportOpenTopBarButtonsTray} from '../actions/index';
+import {reportOpenTopBarButtonsTray} from '../../actions/index';
 import TopUserButtonsTray from './topUserButtonsTray';
 
 
@@ -40,7 +40,7 @@ export class TopBarButton extends Component {
                 <a className="dropdown-toggle" data-toggle="dropdown" onClick={this.handleClick}>
                     <i className={faClass}></i> <i className={faArrowClass}></i>
                 </a>
-                <TopUserButtonsTray/>
+                <TopUserButtonsTray type={this.props.type}/>
             </li>
         );
     }

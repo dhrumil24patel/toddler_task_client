@@ -11,8 +11,10 @@ mutation($username: String!, $password: String!){
             _id
             username
             firstName
-            password
+            lastName
             isAdmin
+            organization
+            department
         }
         token
     }

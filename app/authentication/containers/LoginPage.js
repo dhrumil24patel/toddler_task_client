@@ -113,20 +113,9 @@ function mapDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-const connectedLoginPage = withApollo(compose(graphql(
-    GetAllUsers,
-    {
-        options: {
-            fetchPolicy: 'cache-first'
-        },
-        props: ({ data: { users =  [], loading } }) => ({
-            users: users,
-            loading
-        })
-    }
-), graphql(
-    LoginUser,
-    {
+const connectedLoginPage = withApollo(compose(
+    graphql(
+    LoginUser, {
         options: {
             update: (proxy, {data: {addUser}}) => {
                 // const query = GetAllUsers;
@@ -154,7 +143,7 @@ const connectedLoginPage = withApollo(compose(graphql(
                         //     name: event.username, password: event.password, __typename: 'User', users: { __typename: 'User' }
                         // }
                         login: {
-                            user: {}, token: '', username: event.username, _id: '', password: event.password, __typename: 'User'
+                            user: {}, token: '', __typename: 'User'
                         }
                     }),
                 });

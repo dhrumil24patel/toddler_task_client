@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import {performLogout} from '../../authentication/actions/index';
-import {reportOpenTopBarButtonsTray} from '../actions/index';
+import {performLogout} from '../../../authentication/actions/index';
+import {reportOpenTopBarButtonsTray} from '../../actions/index';
 import {bindActionCreators} from 'redux';
 
 
@@ -23,8 +23,8 @@ class TopUserButtonsTray extends Component {
         temp[this.props.type] = !this.props.openTopBarButtonsTray[this.props.type];
         this.props.reportOpenTopBarButtonsTray(temp);
         this.props.performLogout(true);
-        setTimeout(function tempfn() {
-            this.props.performLogout(true);
+        setTimeout(() => {
+            this.props.performLogout(false);
         }, 0);
     }
 

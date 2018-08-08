@@ -6,3 +6,10 @@ export function reportOpenTopBarButtonsTray(filter) {
         payload: filter
     };
 }
+export function reportDashboardContainerState(filter) {
+    return {
+        type: types.DASHBOARD_CONTAINER_STATE,
+        payload: filter
+    };
+}
+

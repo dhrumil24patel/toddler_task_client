@@ -3,22 +3,29 @@ import React, { Component } from 'react';
 import { graphql, compose, withApollo } from 'react-apollo';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import GetAllUsers from '../../graphql/queries/getAllUsers';
+import GetAllUsers from '../../../graphql/queries/getAllUsers';
 
-import {performLogout, reportUserData} from '../../authentication/actions/index';
+import {performLogout, reportUserData} from '../../../authentication/actions/index';
 
 import TopBar from './topBar';
+import AdminDashboard from './managerDashboard';
+import EmployeeListContainer from './employeeListContainer';
+import AddEmployee from './addEmployee';
+import ResponseListContainer from './responseListContainer';
+import AssignQuestionaireContainer from './assignQuestionaireContainer';
 
-import {navbartoplinks, dropdownmenu, dropdownmessages} from '../../src/styles/filterableTable.scss';
+import {navbartoplinks, dropdownmenu, dropdownmessages} from '../../../src/styles/filterableTable.scss';
 
-class AdminDashboard extends Component {
+class ManagerDashboardContainer extends Component {
 
     componentWillReceiveProps(nextProps) {
-        if(nextProps.authentication.logoutUser) {
-            console.log('lets logout');
+        if(nextProps.authentication.logoutUser !== this.props.authentication.logoutUser && nextProps.authentication.logoutUser) {
+            console.log('lets logout ');
             localStorage.removeItem('user');
             this.props.reportUserData(null);
             this.props.history.push('/');
+            // document.location.reload();
+            this.props.client.resetStore();
         }
     }
 
@@ -241,12 +248,33 @@ class AdminDashboard extends Component {
         );
     }
 
+    renderComponent() {
+        console.log('renderComponent ', this.props.dashboardContainerState);
+        if(this.props.authentication.userData) {
+            if (this.props.dashboardContainerState === 'dashboard') {
+                return (<AdminDashboard organization={this.props.authentication.userData.user.organization}
+                                        username={this.props.authentication.userData.user.username}/>);
+            } else if (this.props.dashboardContainerState === 'employeeList') {
+                return (<EmployeeListContainer organization={this.props.authentication.userData.user.organization}/>);
+            } else if (this.props.dashboardContainerState === 'addEmployee') {
+                return (<AddEmployee organization={this.props.authentication.userData.user.organization}/>);
+            } else if (this.props.dashboardContainerState === 'responseList') {
+                return (<ResponseListContainer organization={this.props.authentication.userData.user.organization}
+                                               username={this.props.authentication.userData.user.username}/>);
+            } else if (this.props.dashboardContainerState === 'assignQuestionaire') {
+                return (<AssignQuestionaireContainer organization={this.props.authentication.userData.user.organization}
+                                                     username={this.props.authentication.userData.user.username}/>);
+            }
+        }
+        return(<div>nothing</div>);
+    }
 
     render() {
         // console.log(this.props);
         return(
-            <div>
-                <TopBar/>
+            <div id={'wrapper'}>
+                <TopBar />
+                {this.renderComponent()}
             </div>
         );
     }
@@ -254,7 +282,8 @@ class AdminDashboard extends Component {
 
 function mapStateToProps(state) {
     return ({
-        authentication: state.authentication
+        authentication: state.authentication,
+        dashboardContainerState: state.dashboard.dashboardContainerState
     });
 }
 
@@ -265,23 +294,4 @@ function mapDispatchToProps(dispatch) {
     }, dispatch);
 }
 
-export default withApollo(compose(
-    graphql(
-        GetAllUsers,
-        {
-            options: () => ({
-                fetchPolicy: 'cache-first',
-                context: { version: 1 }
-                // refetchQueries: [{
-                //     query: SomeOtherQuery,
-                //     context: { version: 1 },    // <-- need this to split the link correctly but refetchQueries only accepts `query` and `variables`.  Also context might be different than the mutate query.
-                //     variables: {/*...*/ }
-                // }]
-            }),
-            props: ({ data: { users =  [], loading } }) => ({
-                users: users,
-                loading
-            })
-        }
-    )
-)(connect(mapStateToProps, mapDispatchToProps)(AdminDashboard)));
+export default withApollo((connect(mapStateToProps, mapDispatchToProps)(ManagerDashboardContainer)));
