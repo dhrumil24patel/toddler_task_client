@@ -22,7 +22,7 @@ export const getApolloClient = () => {
         //     };
         // });
         const httpLink = createHttpLink({
-            uri: 'http://localhost:3000/graphql',
+            uri: `${process.env.GraphQLURL}/graphql`,
         });
 
         const authLink = setContext((_, { headers }) => {

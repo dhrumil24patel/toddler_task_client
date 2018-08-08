@@ -3,12 +3,12 @@ import React, { Component } from 'react';
 import { graphql, compose, withApollo } from 'react-apollo';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import GetAllUsersWithDetails from '../../../graphql/queries/getAllUsersWithDetails';
-import GetAllQuestionairesForManager from '../../../graphql/queries/getAllQuestionairesForManager';
+
+import GetAllQuestionairesForEmployee from '../../../graphql/queries/getQuestionaireForEmployee';
 
 import {reportDashboardContainerState} from '../../actions/index';
 
-import ResponseListRow from './responseListRow';
+import EmployeeResponseListRow from './employeeResponseListRow';
 
 
 class ResponseListContainer extends Component {
@@ -36,7 +36,7 @@ class ResponseListContainer extends Component {
     renderRows() {
         if(this.props.questionaires) {
             return this.props.questionaires.map(item => {
-                return (<ResponseListRow key={item._id} questionaire={item}/>);
+                return (<EmployeeResponseListRow key={item._id} questionaire={item}/>);
             });
         }
         return(<div/>);
@@ -48,14 +48,10 @@ class ResponseListContainer extends Component {
             <div id={'page-wrapper'}>
                 <div className="row">
                     <div className="col-lg-12">
-                        <h1 className="page-header">Questionaire Responses</h1>
+                        <h1 className="page-header">Questionaires</h1>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-xs-2">
-                        <i onClick={this.handleAddEmployeeClick} className={'fa fa-plus fa-2x'}/>
-                    </div>
-                </div>
+
                 <div className="row">
                     <div className="col-lg-6 col-md-12">
                         <div className={'table-responsive'}>
@@ -103,11 +99,11 @@ function mapDispatchToProps(dispatch) {
 
 export default withApollo(compose(
     graphql(
-        GetAllQuestionairesForManager,
+        GetAllQuestionairesForEmployee,
         {
             options: (props) => ({
                 fetchPolicy: 'cache-first',
-                variables: {assignedBy: props.username}
+                variables: {username: props.username}
                 // refetchQueries: [{
                 //     query: SomeOtherQuery,
                 //     context: { version: 1 },    // <-- need this to split the link correctly but refetchQueries only accepts `query` and `variables`.  Also context might be different than the mutate query.

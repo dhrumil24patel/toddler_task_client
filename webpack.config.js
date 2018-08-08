@@ -28,7 +28,8 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
-          'process.env.NODE_ENV': JSON.stringify('development')
+          'process.env.NODE_ENV': JSON.stringify('development'),
+            'process.env.GraphQLURL': JSON.stringify('http://localhost:3000')
         })
     ],
     eslint: {

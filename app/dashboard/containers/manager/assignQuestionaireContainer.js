@@ -69,11 +69,8 @@ class AssignQuestionaireContainer extends Component {
             this.props.assignQuestionaire(user)
                 .then(res=>{
                     this.props.reportAuthenticationProcessing(false);
-                    // localStorage.setItem('user', JSON.stringify(res.data.register));
-                    // this.props.reportUserData(res.data.register);
-                    console.log('done adding  user  ', res);
+                    // console.log('done adding  user  ', res);
                     this.props.reportDashboardContainerState('responseList');
-                    // this.props.history.push('/');
                 })
                 .catch(err=>{
                     this.props.reportAuthenticationProcessing(false);
@@ -86,7 +83,6 @@ class AssignQuestionaireContainer extends Component {
     }
 
     renderOrganizations() {
-        console.log('assignQuestionaire ', this.props, this.state);
         const {organizations} = this.props;
         const user = this.state.user;
         if(organizations.length === 1 || user.organization === '') {
@@ -105,7 +101,6 @@ class AssignQuestionaireContainer extends Component {
     }
 
     renderQuestionaireTemplates() {
-        console.log('assignQuestionaire  tem ', this.props, this.state);
         const {questionaireTemplates} = this.props;
         const user = this.state.user;
         if(questionaireTemplates.length === 1 || user.organization === '') {
@@ -161,9 +156,13 @@ class AssignQuestionaireContainer extends Component {
 }
 
 function mapStateToProps(state) {
+    let organization;
+    if(state.authentication.userData) {
+        organization = state.authentication.userData.user.organization;
+    }
     return ({
         authentication: state.authentication,
-        organization: state.authentication.userData.user.organization
+        organization
     });
 }
 
@@ -211,16 +210,13 @@ export default withApollo(compose(
                     console.log('mutation assign ', mutationResult);
                     if(mutationResult.data.assignQuestionaire._id) {
                         const addedQuestionaire = mutationResult.data.assignQuestionaire;
-                        console.log('here 1 ', addedQuestionaire);
                         const query = GetAllQuestionaireForManager;
-                        console.log('here 2');
                         const data = proxy.readQuery({
                             query,
                             variables: {
                                 assignedBy: addedQuestionaire.assignedBy
                             }
                         });
-                        console.log('here 3');
 
                         data.questionaires = [...data.questionaires.filter(questionaire => questionaire._id !== addedQuestionaire._id), addedQuestionaire];
 
@@ -234,7 +230,6 @@ export default withApollo(compose(
                         const data2 = {questionaires: [...data.questionaires.filter(user => user._id !== addedQuestionaire._id), addedQuestionaire]};
 
                         proxy.writeQuery({query: query2, variables, data: data2});
-                        console.log(addedQuestionaire, data);
                     }
                 }
             },

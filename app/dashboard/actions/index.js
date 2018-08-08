@@ -13,3 +13,17 @@ export function reportDashboardContainerState(filter) {
     };
 }
 
+export function reportRespondingQuestionaire(filter) {
+    return {
+        type: types.DASHBOARD_RESPONDING_QUESTIONAIRE,
+        payload: filter
+    };
+}
+
+export function reportViewingQuestionaire(filter) {
+    return {
+        type: types.DASHBOARD_VIEWING_QUESTIONAIRE,
+        payload: filter
+    };
+}
+

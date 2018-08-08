@@ -1,6 +1,7 @@
 import React from 'react';
 import { Redirect, withRouter} from 'react-router-dom';
 import ManagerDashboardContainer from '../../dashboard/containers/manager/managerDashboardContainer';
+import EmployeeDashboardContainer from '../../dashboard/containers/employee/employeeDashboardContainer';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {reportUserData} from '../../authentication/actions/index';
@@ -23,7 +24,7 @@ class PrivateRoute extends  React.Component {
             return(
                 userData.user.isAdmin
                     ? <ManagerDashboardContainer {...this.props} />
-                    : <Redirect to={{ pathname: '/login' }} />
+                    : <EmployeeDashboardContainer {...this.props} />
             );
         }
         return(<Redirect to={{ pathname: '/login' }} />);

@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export default gql(`
-query($assignedBy:String!) {
-    questionaires(assignedBy:$assignedBy){
+query($username:String!) {
+    questionaires(username:$username){
         _id
         username
         questionaireTemplateType

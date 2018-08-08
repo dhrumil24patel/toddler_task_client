@@ -52,7 +52,8 @@ module.exports = {
         }),
         // plugin for passing in data to the js, like what NODE_ENV we are in.
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
+            'process.env.NODE_ENV': JSON.stringify('production'),
+            'process.env.GraphQLURL': JSON.stringify('https://dhrumil242.herokuapp.com')
         })
     ],
 
@@ -84,7 +85,7 @@ module.exports = {
             test: /\.scss$/,
             // we extract the styles into their own .css file instead of having
             // them inside the js.
-            loader: ExtractTextPlugin.extract('style', 'css?modules&localIdentName=[name]---[local]---[hash:base64:5]!sass')
+            loader: ExtractTextPlugin.extract('style', 'css?modules&localIdentName=[local]!sass')
         }, {
             test: /\.woff(2)?(\?[a-z0-9#=&.]+)?$/,
             loader: 'url?limit=10000&mimetype=application/font-woff'

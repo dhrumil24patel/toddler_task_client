@@ -6,20 +6,29 @@ import { bindActionCreators } from 'redux';
 import DeleteUser from '../../../graphql/mutations/deleteUser';
 
 import {performLogout, reportUserData} from '../../../authentication/actions/index';
+import {reportRespondingQuestionaire, reportDashboardContainerState, reportViewingQuestionaire} from '../../../dashboard/actions/index';
 import GetAllUsersWithDetails from '../../../graphql/queries/getAllUsersWithDetails';
 
-class EmployeeListRow extends Component {
+class ResponseListRow extends Component {
 
     constructor(props) {
         super(props);
         this.handleEdit = this.handleEdit.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.handleView = this.handleView.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
     }
 
     handleEdit(e) {
+        this.props.reportRespondingQuestionaire(this.props.questionaire);
+        this.props.reportDashboardContainerState('respondQuestionaire');
+    }
+
+    handleView(e) {
+        this.props.reportViewingQuestionaire(this.props.questionaire);
+        this.props.reportDashboardContainerState('viewQuestionaire');
     }
 
     handleDelete(e) {
@@ -27,30 +36,25 @@ class EmployeeListRow extends Component {
     }
 
     renderActions() {
-        if(this.props.authentication.userData.user._id !== this.props.user._id) {
-            return (
-                <td>
-                    <ui>
-                        <li onClick={this.handleEdit} className={'fa fa-edit fa-fw'}/>
-                        <li onClick={this.handleDelete} className={'fa fa-trash fa-fw'}/>
-                    </ui>
-                </td>
-            );
-        }
         return (
-            <td></td>
+            <td>
+                <ui>
+                    <li onClick={this.handleView} className={'fa fa-eye fa-fw'}/>
+                    {(!this.props.questionaire.responded ?
+                        <li onClick={this.handleEdit} className={'fa fa-edit fa-fw'}/> : <li className={'fa fa-sdsd fa-fw'}/>)}
+                </ui>
+            </td>
         );
     }
 
 
     render() {
-        console.log(this.props);
         return(
             <tr>
-                <td>{this.props.user.username}</td>
-                <td>{this.props.user.firstName}</td>
-                <td>{this.props.user.lastName}</td>
-                <td>{this.props.user.department}</td>
+                <td>{this.props.questionaire.username}</td>
+                <td>{this.props.questionaire.questionaireTemplateType}</td>
+                <td>{this.props.questionaire.assignedAt}</td>
+                {(this.props.questionaire.responded ? <td>{'Yes'}</td> : <td>{'No'}</td>)}
                 {this.renderActions()}
             </tr>
         );
@@ -59,8 +63,10 @@ class EmployeeListRow extends Component {
 
 function mapStateToProps(state) {
     let organization;
+    let username;
     if(state.authentication.userData) {
         organization = state.authentication.userData.user.organization;
+        username = state.authentication.userData.user.username;
     }
     return ({
         authentication: state.authentication,
@@ -70,8 +76,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-        performLogout,
-        reportUserData
+        reportRespondingQuestionaire,
+        reportDashboardContainerState,
+        reportViewingQuestionaire
     }, dispatch);
 }
 
@@ -82,32 +89,29 @@ export default withApollo(compose(
             options: {
                 update: (proxy, mutationResult) => {
                     if(mutationResult.data.deleteUser && mutationResult.data.deleteUser) {
-                        const addedUser = mutationResult.data.deleteUser;
-                        console.log('here 1 ', addedUser);
+                        const deletedUser = mutationResult.data.deleteUser;
                         const query = GetAllUsersWithDetails;
-                        console.log('here 2');
                         const data = proxy.readQuery({
                             query,
                             variables: {
-                                organization: addedUser.organization
+                                organization: deletedUser.organization
                             }
                         });
-                        console.log('here 3');
 
-                        data.users = [...data.users.filter(user => user.username !== addedUser.username)];
+                        data.users = [...data.users.filter(user => user.username !== deletedUser.username)];
 
                         proxy.writeQuery({query, data});
 
                         // Create cache entry for QueryGetEvent
                         const query2 = GetAllUsersWithDetails;
                         const variables = {
-                            username: addedUser.username,
-                            organization: addedUser.organization
+                            username: deletedUser.username,
+                            organization: deletedUser.organization
                         };
-                        const data2 = {users: [...data.users.filter(user => user.username !== addedUser.username)]};
+                        const data2 = {users: [...data.users.filter(user => user.username !== deletedUser.username)]};
 
                         proxy.writeQuery({query: query2, variables, data: data2});
-                        console.log(addedUser, data);
+                        console.log(deletedUser, data);
                     }
                 }
             },
@@ -128,4 +132,4 @@ export default withApollo(compose(
             })
         }
     )
-)(connect(mapStateToProps, mapDispatchToProps)(EmployeeListRow)));
+)(connect(mapStateToProps, mapDispatchToProps)(ResponseListRow)));

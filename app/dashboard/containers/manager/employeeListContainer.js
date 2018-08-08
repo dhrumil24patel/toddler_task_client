@@ -29,7 +29,7 @@ class EmployeeListContainer extends Component {
     }
 
     handleAddEmployeeClick(e) {
-        console.log('handleAddEmployee');
+        // console.log('handleAddEmployee');
         this.props.reportDashboardContainerState('addEmployee');
     }
 
@@ -43,7 +43,7 @@ class EmployeeListContainer extends Component {
     }
 
     render() {
-        console.log(this.props);
+        // console.log(this.props);
         return(
             <div id={'page-wrapper'}>
                 <div className="row">
@@ -82,9 +82,13 @@ class EmployeeListContainer extends Component {
 }
 
 function mapStateToProps(state) {
+    let organization;
+    if(state.authentication.userData) {
+        organization = state.authentication.userData.user.organization;
+    }
     return ({
         authentication: state.authentication,
-        organization: state.authentication.userData.user.organization
+        organization
     });
 }
 

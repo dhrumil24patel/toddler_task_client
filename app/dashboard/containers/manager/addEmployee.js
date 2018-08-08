@@ -163,9 +163,13 @@ class AddEmployee extends Component {
 }
 
 function mapStateToProps(state) {
+    let organization;
+    if(state.authentication.userData) {
+        organization = state.authentication.userData.user.organization;
+    }
     return ({
         authentication: state.authentication,
-        organization: state.authentication.userData.user.organization
+        organization
     });
 }
 

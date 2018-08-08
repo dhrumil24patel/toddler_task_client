@@ -5,11 +5,13 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import GetAllUsers from '../../../graphql/queries/getAllUsers';
 
+import {} from '../../../src/styles/filterableTable.scss';
+
 import {performLogout, reportUserData} from '../../../authentication/actions/index';
 import {reportDashboardContainerState} from '../../actions/index';
 
 import {navbartoplinks, dropdownmenu, dropdownmessages} from '../../../src/styles/filterableTable.scss';
-import GetAllQuestionairesForManager from '../../../graphql/queries/getAllQuestionairesForManager';
+import GetAllQuestionairesForEmployee from '../../../graphql/queries/getQuestionaireForEmployee';
 
 class ManagerDashboard extends Component {
 
@@ -32,7 +34,7 @@ class ManagerDashboard extends Component {
 
 
     render() {
-        console.log(this.props);
+        // console.log(this.props);
         return(
             <div id={'page-wrapper'}>
                 <div className="row">
@@ -41,29 +43,6 @@ class ManagerDashboard extends Component {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-lg-3 col-md-6">
-                        <div className="panel panel-primary">
-                            <div className="panel-heading">
-                                <div className="row">
-                                    <div className="col-xs-3">
-                                        <i className="fa fa-users fa-5x"></i>
-                                    </div>
-                                    <div className="col-xs-9 text-right">
-                                        <div className="huge">{this.props.users.length}</div>
-                                        <div>Total Employees</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a onClick={this.handleEmployeeViewClick}>
-                                <div className="panel-footer">
-                                    <span className="pull-left">View</span>
-                                    <span className="pull-right"><i className="fa fa-arrow-circle-right"></i></span>
-                                    <div className="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
                     <div className="col-lg-3 col-md-6">
                         <div className="panel panel-green">
                             <div className="panel-heading">
@@ -148,11 +127,11 @@ export default withApollo(compose(
             })
         }
     ), graphql(
-        GetAllQuestionairesForManager,
+        GetAllQuestionairesForEmployee,
         {
             options: (props) => ({
                 fetchPolicy: 'cache-first',
-                variables: {assignedBy: props.username}
+                variables: {username: props.username}
                 // refetchQueries: [{
                 //     query: SomeOtherQuery,
                 //     context: { version: 1 },    // <-- need this to split the link correctly but refetchQueries only accepts `query` and `variables`.  Also context might be different than the mutate query.

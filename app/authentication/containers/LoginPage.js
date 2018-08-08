@@ -63,7 +63,7 @@ class LoginPage extends React.Component {
     }
 
     render() {
-        console.log(this.props);
+        // console.log(this.props);
         const { loggingIn } = this.props;
         const { username, password, submitted } = this.state;
         return (
@@ -118,20 +118,6 @@ const connectedLoginPage = withApollo(compose(
     LoginUser, {
         options: {
             update: (proxy, {data: {addUser}}) => {
-                // const query = GetAllUsers;
-                // const data = proxy.readQuery({query});
-                //
-                // data.users = [...data.users.filter(user => user._id !== addUser._id), addUser];
-                //
-                // proxy.writeQuery({query, data});
-                //
-                // // Create cache entry for QueryGetEvent
-                // const query2 = GetAllUsers;
-                // const variables = { username: addUser.username, password: addUser.password };
-                // const data2 = { getEvent: { ...addUser } };
-                //
-                // proxy.writeQuery({ query: query2, variables, data: data2 });
-                // console.log(addUser, data);
             }
         },
         props: (props) => ({

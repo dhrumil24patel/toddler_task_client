@@ -1,46 +1,32 @@
 import React, { Component } from 'react';
 
-import { graphql, compose, withApollo } from 'react-apollo';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import DeleteUser from '../../../graphql/mutations/deleteUser';
-
-import {performLogout, reportUserData} from '../../../authentication/actions/index';
-import GetAllUsersWithDetails from '../../../graphql/queries/getAllUsersWithDetails';
+import {reportViewingQuestionaire, reportDashboardContainerState} from '../../../dashboard/actions/index';
 
 class ResponseListRow extends Component {
 
     constructor(props) {
         super(props);
-        this.handleEdit = this.handleEdit.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
+        this.handleView = this.handleView.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
     }
 
-    handleEdit(e) {
-        console.log('edit ', this.props.user);
-    }
-
-    handleDelete(e) {
-        console.log('delete ', this.props.user);
-        this.props.deleteUser({username: this.props.user.username, organization: this.props.user.organization});
+    handleView(e) {
+        // console.log('view ', this.props.user);
+        this.props.reportViewingQuestionaire(this.props.questionaire);
+        this.props.reportDashboardContainerState('viewQuestionaire');
     }
 
     renderActions() {
-        if(true) {
-            return (
-                <td>
-                    <ui>
-                        <li onClick={this.handleEdit} className={'fa fa-eye fa-fw'}/>
-                        <li onClick={this.handleDelete} className={'fa fa-ddf fa-fw'}/>
-                    </ui>
-                </td>
-            );
-        }
         return (
-            <td></td>
+            <td>
+                <ui>
+                    <li onClick={this.handleView} className={'fa fa-eye fa-fw'}/>
+                </ui>
+            </td>
         );
     }
 
@@ -60,70 +46,23 @@ class ResponseListRow extends Component {
 }
 
 function mapStateToProps(state) {
+    let organization;
+    let username;
+    if(state.authentication.userData) {
+        organization = state.authentication.userData.user.organization;
+        username = state.authentication.userData.user.username;
+    }
     return ({
         authentication: state.authentication,
-        organization: state.authentication.userData.user.organization
+        organization
     });
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
-        performLogout,
-        reportUserData
+        reportViewingQuestionaire,
+        reportDashboardContainerState
     }, dispatch);
 }
 
-export default withApollo(compose(
-    graphql(
-        DeleteUser,
-        {
-            options: {
-                update: (proxy, mutationResult) => {
-                    if(mutationResult.data.deleteUser && mutationResult.data.deleteUser) {
-                        const addedUser = mutationResult.data.deleteUser;
-                        console.log('here 1 ', addedUser);
-                        const query = GetAllUsersWithDetails;
-                        console.log('here 2');
-                        const data = proxy.readQuery({
-                            query,
-                            variables: {
-                                organization: addedUser.organization
-                            }
-                        });
-                        console.log('here 3');
-
-                        data.users = [...data.users.filter(user => user.username !== addedUser.username)];
-
-                        proxy.writeQuery({query, data});
-
-                        // Create cache entry for QueryGetEvent
-                        const query2 = GetAllUsersWithDetails;
-                        const variables = {
-                            username: addedUser.username,
-                            organization: addedUser.organization
-                        };
-                        const data2 = {users: [...data.users.filter(user => user.username !== addedUser.username)]};
-
-                        proxy.writeQuery({query: query2, variables, data: data2});
-                        console.log(addedUser, data);
-                    }
-                }
-            },
-            props: (props) => ({
-                deleteUser: (userMeta) => {
-                    return props.mutate({
-                        variables: userMeta,
-                        optimisticResponse: () => ({
-                            // addUser: {
-                            //     name: user.username, password: user.password, __typename: 'User', users: { __typename: 'User' }
-                            // }
-                            register: {
-                                username: '', organization: '', __typename: 'UserMeta'
-                            }
-                        }),
-                    });
-                }
-            })
-        }
-    )
-)(connect(mapStateToProps, mapDispatchToProps)(ResponseListRow)));
+export default connect(mapStateToProps, mapDispatchToProps)(ResponseListRow);

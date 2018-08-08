@@ -1,6 +1,8 @@
-import{openTopBarButtonsTray, dashboardContainerState} from './reducers';
+import{openTopBarButtonsTray, dashboardContainerState, respondingQuestionaire, viewingQuestionaire} from './reducers';
 
 export const dashboardReducers = {
     openTopBarButtonsTray,
-    dashboardContainerState
+    dashboardContainerState,
+    respondingQuestionaire,
+    viewingQuestionaire
 };

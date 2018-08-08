@@ -42,9 +42,9 @@ class SearchDropDown extends Component {
     }
 
     handleSelectButtonClick(value, e) {
-        console.log(e.target);
-        console.log(e.target.name);
-        console.log(value);
+        // console.log(e.target);
+        // console.log(e.target.name);
+        // console.log(value);
         this.setState({users: this.props.users, dropDownOpen: !this.state.dropDownOpen, selection: value});
         this.props.handleChange({target: {value: e.target.name, name: 'username'}});
     }
@@ -91,9 +91,15 @@ class SearchDropDown extends Component {
 }
 
 function mapStateToProps(state) {
+    let organization;
+    let username;
+    if(state.authentication.userData) {
+        organization = state.authentication.userData.user.organization;
+        username = state.authentication.userData.user.username;
+    }
     return ({
         authentication: state.authentication,
-        organization: state.authentication.userData.user.organization
+        organization
     });
 }
 

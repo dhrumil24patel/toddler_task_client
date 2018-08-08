@@ -42,9 +42,6 @@ class AdminSideBar extends Component {
                             <a onClick={this.handleDashboardClick}><i className="fa fa-dashboard fa-fw"></i> Dashboard</a>
                         </li>
                         <li>
-                            <a onClick={this.handleEmployeesClick}><i className="fa fa-users fa-fw"></i> Employees</a>
-                        </li>
-                        <li>
                             <a onClick={this.handleResponseClick}><i className="fa fa-clipboard fa-fw"></i> Responses</a>
                         </li>
                         <li>

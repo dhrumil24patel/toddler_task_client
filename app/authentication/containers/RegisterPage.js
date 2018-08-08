@@ -67,7 +67,7 @@ class RegisterPage extends React.Component {
     }
 
     renderOrganizations() {
-        console.log('register ', this.props, this.state);
+        // console.log('register ', this.props, this.state);
         const {organizations} = this.props;
         const user = this.state.user;
         if(organizations.length === 1 || user.organization === '') {
@@ -175,20 +175,6 @@ const connectedRegisterPage = withApollo(compose(
     {
         options: {
             update: (proxy, {data: {addUser}}) => {
-                const query = GetAllOrganization;
-                // const data = proxy.readQuery({query});
-                //
-                // data.users = [...data.users.filter(user => user._id !== addUser._id), addUser];
-                //
-                // proxy.writeQuery({query, data});
-                //
-                // // Create cache entry for QueryGetEvent
-                // const query2 = GetAllOrganization;
-                // const variables = { name: addUser.name, password: addUser.password };
-                // const data2 = { getEvent: { ...addUser } };
-                //
-                // proxy.writeQuery({ query: query2, variables, data: data2 });
-                // console.log(addUser, data);
             }
         },
         props: (props) => ({
